@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#8b5cf6">
+    <meta name="description" content="Sign in to TaskFlow — your personal task manager.">
+    <title>TaskFlow — Sign In</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+    <!-- ── Top bar ─────────────────────────────────────────── -->
+    <header class="topbar" role="banner">
+        <div class="topbar-inner">
+            <div class="topbar-brand">
+                <span class="brand-icon" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                    </svg>
+                </span>
+                <span class="brand-name">TaskFlow</span>
+            </div>
+            <div class="topbar-actions">
+                <button class="icon-btn" id="themeToggle" aria-label="Toggle light/dark mode">
+                    <!-- icon injected by JS -->
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ── Auth page ───────────────────────────────────────── -->
+    <main class="login-page" id="main-content">
+        <div class="login-card">
+
+            <!-- Brand mark -->
+            <div class="login-brand" aria-hidden="true">
+                <div class="login-brand-icon">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                    </svg>
+                </div>
+            </div>
+
+            <h1 class="login-title">TaskFlow</h1>
+            <p class="login-subtitle">Organize your work, one task at a time.</p>
+
+            <!-- Tab switcher -->
+            <div class="auth-tabs" role="tablist" aria-label="Authentication options">
+                <button class="auth-tab auth-tab--active" id="tab-signin" role="tab"
+                        aria-selected="true" aria-controls="panel-signin">Sign In</button>
+                <button class="auth-tab" id="tab-signup" role="tab"
+                        aria-selected="false" aria-controls="panel-signup">Sign Up</button>
+            </div>
+
+            <!-- Sign In panel -->
+            <div id="panel-signin" class="auth-panel" role="tabpanel" aria-labelledby="tab-signin">
+                <form id="loginForm" class="login-form" novalidate>
+                    <div class="field">
+                        <label class="field-label" for="loginUsername">Username</label>
+                        <input class="field-input" id="loginUsername" name="username" type="text"
+                               placeholder="Enter your username" autocomplete="username" required autofocus>
+                        <span class="field-error" id="login-username-error" role="alert"></span>
+                    </div>
+                    <div class="field">
+                        <label class="field-label" for="loginPassword">Password</label>
+                        <div class="password-wrap">
+                            <input class="field-input" id="loginPassword" name="password" type="password"
+                                   placeholder="Enter your password" autocomplete="current-password" required>
+                            <button type="button" class="pwd-eye-btn" id="loginPasswordToggle"
+                                    aria-label="Show password" aria-pressed="false">
+                                <svg class="eye-icon eye-show" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg class="eye-icon eye-hide" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                            </button>
+                        </div>
+                        <span class="field-error" id="login-password-error" role="alert"></span>
+                    </div>
+                    <div id="loginError" class="form-banner form-banner--error" role="alert" aria-live="polite" hidden></div>
+                    <button type="submit" class="btn btn-primary login-submit" id="loginBtn">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                        Sign In
+                    </button>
+                </form>
+            </div>
+
+            <!-- Sign Up panel -->
+            <div id="panel-signup" class="auth-panel auth-panel--hidden" role="tabpanel" aria-labelledby="tab-signup">
+                <form id="registerForm" class="login-form" novalidate>
+                    <div class="field">
+                        <label class="field-label" for="regUsername">Username</label>
+                        <input class="field-input" id="regUsername" name="username" type="text"
+                               placeholder="Choose a username" autocomplete="username" required>
+                        <span class="field-hint">At least 3 characters.</span>
+                        <span class="field-error" id="reg-username-error" role="alert"></span>
+                    </div>
+                    <div class="field">
+                        <label class="field-label" for="regPassword">Password</label>
+                        <div class="password-wrap">
+                            <input class="field-input" id="regPassword" name="password" type="password"
+                                   placeholder="Create a password" autocomplete="new-password" required>
+                            <button type="button" class="pwd-eye-btn" id="regPasswordToggle"
+                                    aria-label="Show password" aria-pressed="false">
+                                <svg class="eye-icon eye-show" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg class="eye-icon eye-hide" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                            </button>
+                        </div>
+                        <span class="field-hint">At least 6 characters.</span>
+                        <span class="field-error" id="reg-password-error" role="alert"></span>
+                    </div>
+                    <div class="field">
+                        <label class="field-label" for="regConfirm">Confirm Password</label>
+                        <div class="password-wrap">
+                            <input class="field-input" id="regConfirm" name="confirm" type="password"
+                                   placeholder="Repeat your password" autocomplete="new-password" required>
+                            <button type="button" class="pwd-eye-btn" id="regConfirmToggle"
+                                    aria-label="Show password" aria-pressed="false">
+                                <svg class="eye-icon eye-show" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg class="eye-icon eye-hide" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                            </button>
+                        </div>
+                        <span class="field-error" id="reg-confirm-error" role="alert"></span>
+                    </div>
+                    <div id="registerError" class="form-banner form-banner--error" role="alert" aria-live="polite" hidden></div>
+                    <button type="submit" class="btn btn-primary login-submit" id="registerBtn">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                        Create Account
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="./config.js"></script>
+    <script src="./login.js"></script>
+</body>
+</html>
