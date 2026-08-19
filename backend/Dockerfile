@@ -9,6 +9,6 @@ RUN mvn -B package -DskipTests
 
 FROM eclipse-temurin:17-jdk
 WORKDIR /app
-COPY --from=build /app/target/taskflow-backend-1.0.0-shaded.jar ./app.jar
+COPY --from=build /app/target/app.jar ./app.jar
 EXPOSE 8080
 CMD ["java", "-jar", "app.jar"]
