@@ -1,0 +1,35 @@
+# ── Java build output ─────────────────────────────────────────────
+backend/target/
+backend/out/
+*.class
+
+# ── H2 embedded database files (local dev only, never commit) ─────
+backend/contactflow_data.mv.db
+backend/contactflow_data.lock.db
+backend/contactflow_data.trace.db
+*.mv.db
+*.lock.db
+*.trace.db
+
+# ── IDE files ──────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.code-workspace
+
+# ── OS files ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs ───────────────────────────────────────────────────────────
+*.log
+backend/compile.log
+
+# ── Environment / secrets ──────────────────────────────────────────
+.env
+.env.local
+*.env
+
+# ── Node (if ever added) ───────────────────────────────────────────
+node_modules/

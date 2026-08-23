@@ -6,6 +6,6 @@ public class Main {
         }
         Server server = new Server(port);
         int actualPort = server.start();
-        System.out.println("TaskFlow server started on http://0.0.0.0:" + actualPort);
+        System.out.println("ContactFlow server started on http://0.0.0.0:" + actualPort);
     }
 }

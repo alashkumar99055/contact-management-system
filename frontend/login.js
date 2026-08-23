@@ -2,13 +2,13 @@
 
 /* ── API helpers ─────────────────────────────────────────── */
 function getApiBaseUrl() {
-    return (window.TASKFLOW_CONFIG || {}).apiBaseUrl || '';
+    return (window.CONTACTFLOW_CONFIG || {}).apiBaseUrl || '';
 }
 function apiUrl(path) { return `${getApiBaseUrl()}${path}`; }
 
 /* ── Redirect if already logged in ──────────────────────── */
 (function checkExistingSession() {
-    const token = sessionStorage.getItem('tf-token');
+    const token = sessionStorage.getItem('cf-token');
     if (token) {
         fetch(apiUrl('/api/me'), { headers: { 'Authorization': 'Bearer ' + token } })
             .then(res => { if (res.ok) window.location.replace('./index.html'); })
@@ -21,7 +21,7 @@ const themeToggle = document.getElementById('themeToggle');
 
 function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('tf-theme', theme);
+    localStorage.setItem('cf-theme', theme);
     themeToggle.innerHTML = theme === 'dark'
         ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`
         : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
@@ -29,7 +29,7 @@ function applyTheme(theme) {
 }
 
 (function initTheme() {
-    applyTheme(localStorage.getItem('tf-theme') || 'light');
+    applyTheme(localStorage.getItem('cf-theme') || 'light');
 })();
 
 themeToggle.addEventListener('click', () => {
@@ -38,8 +38,8 @@ themeToggle.addEventListener('click', () => {
 });
 
 /* ── Tab switching ───────────────────────────────────────── */
-const tabSignIn  = document.getElementById('tab-signin');
-const tabSignUp  = document.getElementById('tab-signup');
+const tabSignIn   = document.getElementById('tab-signin');
+const tabSignUp   = document.getElementById('tab-signup');
 const panelSignIn = document.getElementById('panel-signin');
 const panelSignUp = document.getElementById('panel-signup');
 
@@ -115,8 +115,8 @@ loginForm.addEventListener('submit', async (e) => {
         });
         const data = await res.json();
         if (!res.ok) { loginError.textContent = data.error || 'Login failed.'; loginError.hidden = false; return; }
-        sessionStorage.setItem('tf-token',    data.token);
-        sessionStorage.setItem('tf-username', data.username);
+        sessionStorage.setItem('cf-token',    data.token);
+        sessionStorage.setItem('cf-username', data.username);
         window.location.replace('./index.html');
     } catch {
         loginError.textContent = 'Could not reach the server. Is the backend running?';
@@ -197,8 +197,8 @@ registerForm.addEventListener('submit', async (e) => {
         });
         const data = await res.json();
         if (!res.ok) { registerError.textContent = data.error || 'Registration failed.'; registerError.hidden = false; return; }
-        sessionStorage.setItem('tf-token',    data.token);
-        sessionStorage.setItem('tf-username', data.username);
+        sessionStorage.setItem('cf-token',    data.token);
+        sessionStorage.setItem('cf-username', data.username);
         window.location.replace('./index.html');
     } catch {
         registerError.textContent = 'Could not reach the server. Is the backend running?';

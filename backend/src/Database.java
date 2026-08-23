@@ -1,3 +1,5 @@
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -24,79 +26,62 @@ public class Database {
         return DriverManager.getConnection(url, username, password);
     }
 
-    // ── Schema initialisation ─────────────────────────────────────────────────
+    // ── Schema ────────────────────────────────────────────────────────────────
 
     private void initSchema() throws SQLException {
         String authSql =
             "CREATE TABLE IF NOT EXISTS authentication (" +
-            "  id            UUID        PRIMARY KEY," +
+            "  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid()," +
             "  username      TEXT        NOT NULL UNIQUE," +
             "  password_hash TEXT        NOT NULL," +
-            "  created_at    TIMESTAMP   NOT NULL DEFAULT NOW()" +
+            "  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()" +
             ")";
 
-        String categoriesSql =
-            "CREATE TABLE IF NOT EXISTS categories (" +
-            "  id         UUID      PRIMARY KEY," +
-            "  user_id    UUID      NOT NULL REFERENCES authentication(id) ON DELETE CASCADE," +
-            "  name       TEXT      NOT NULL," +
-            "  color      TEXT      NOT NULL DEFAULT '#a78bfa'," +
-            "  created_at TIMESTAMP NOT NULL DEFAULT NOW()" +
+        String contactsSql =
+            "CREATE TABLE IF NOT EXISTS contacts (" +
+            "  id         UUID        PRIMARY KEY DEFAULT gen_random_uuid()," +
+            "  user_id    UUID        NOT NULL REFERENCES authentication(id) ON DELETE CASCADE," +
+            "  name       TEXT        NOT NULL," +
+            "  phone      TEXT        NOT NULL DEFAULT ''," +
+            "  email      TEXT        NOT NULL DEFAULT ''," +
+            "  address    TEXT        NOT NULL DEFAULT ''," +
+            "  category   TEXT        NOT NULL DEFAULT ''," +
+            "  notes      TEXT        NOT NULL DEFAULT ''," +
+            "  favorite   BOOLEAN     NOT NULL DEFAULT FALSE," +
+            "  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()," +
+            "  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()" +
             ")";
 
-        String tasksSql =
-            "CREATE TABLE IF NOT EXISTS tasks (" +
-            "  id           UUID      PRIMARY KEY," +
-            "  user_id      UUID      NOT NULL REFERENCES authentication(id) ON DELETE CASCADE," +
-            "  title        TEXT      NOT NULL," +
-            "  description  TEXT," +
-            "  status       TEXT      NOT NULL DEFAULT 'pending'," +
-            "  priority     TEXT      NOT NULL DEFAULT 'medium'," +
-            "  due_date     DATE," +
-            "  due_time     TEXT," +
-            "  category_id  UUID      REFERENCES categories(id) ON DELETE SET NULL," +
-            "  tags         TEXT      DEFAULT ''," +
-            "  created_at   TIMESTAMP NOT NULL DEFAULT NOW()," +
-            "  updated_at   TIMESTAMP NOT NULL DEFAULT NOW()," +
-            "  completed_at TIMESTAMP" +
-            ")";
+        // Safe migrations for existing deployments that have old schema
+        String addCategory  = "ALTER TABLE contacts ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT ''";
+        String addFavorite  = "ALTER TABLE contacts ADD COLUMN IF NOT EXISTS favorite BOOLEAN NOT NULL DEFAULT FALSE";
 
-        String idxUserSql      = "CREATE INDEX IF NOT EXISTS idx_tasks_user_id      ON tasks(user_id)";
-        String idxStatusSql    = "CREATE INDEX IF NOT EXISTS idx_tasks_status        ON tasks(status)";
-        String idxDueSql       = "CREATE INDEX IF NOT EXISTS idx_tasks_due_date      ON tasks(due_date)";
-        String idxCatUserSql   = "CREATE INDEX IF NOT EXISTS idx_categories_user_id  ON categories(user_id)";
+        String idxUser      = "CREATE INDEX IF NOT EXISTS idx_contacts_user_id  ON contacts(user_id)";
+        String idxName      = "CREATE INDEX IF NOT EXISTS idx_contacts_name     ON contacts(user_id, lower(name))";
+        String idxFavorite  = "CREATE INDEX IF NOT EXISTS idx_contacts_favorite ON contacts(user_id, favorite)";
+        String idxCategory  = "CREATE INDEX IF NOT EXISTS idx_contacts_category ON contacts(user_id, category)";
 
-        // Drop the old passwords table only if tasks already exists (migration safety)
-        String dropPasswordsSql =
-            "DO $$ BEGIN " +
-            "  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='tasks') THEN " +
-            "    DROP TABLE IF EXISTS passwords CASCADE; " +
-            "  END IF; " +
-            "END $$";
-
-        try (Connection conn = getConnection(); Statement st = conn.createStatement()) {
+        try (Connection c = getConnection(); Statement st = c.createStatement()) {
             st.execute(authSql);
-            st.execute(categoriesSql);
-            st.execute(tasksSql);
-            st.execute(idxUserSql);
-            st.execute(idxStatusSql);
-            st.execute(idxDueSql);
-            st.execute(idxCatUserSql);
-            st.execute(dropPasswordsSql);
+            st.execute(contactsSql);
+            st.execute(addCategory);
+            st.execute(addFavorite);
+            st.execute(idxUser);
+            st.execute(idxName);
+            st.execute(idxFavorite);
+            st.execute(idxCategory);
         }
     }
 
     // ── Authentication ────────────────────────────────────────────────────────
 
-    /** Hash a password using SHA-256 with a 16-byte random salt.
-     *  Stored format: base64(salt) + ":" + base64(sha256(salt || password)) */
-    public static String hashPassword(String plainPassword) {
+    public static String hashPassword(String plain) {
         try {
             byte[] salt = new byte[16];
             new SecureRandom().nextBytes(salt);
-            return computeHash(salt, plainPassword);
+            return computeHash(salt, plain);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 not available", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -110,321 +95,377 @@ public class Database {
 
     public static boolean verifyPassword(String plain, String stored) {
         try {
-            String[] parts = stored.split(":", 2);
-            if (parts.length != 2) return false;
-            byte[] salt = Base64.getDecoder().decode(parts[0]);
+            String[] p = stored.split(":", 2);
+            if (p.length != 2) return false;
+            byte[] salt = Base64.getDecoder().decode(p[0]);
             return computeHash(salt, plain).equals(stored);
-        } catch (Exception e) {
-            return false;
+        } catch (Exception e) { return false; }
+    }
+
+    public User createUser(String uname, String plain) throws SQLException {
+        String sql = "INSERT INTO authentication (username, password_hash) VALUES (?,?) RETURNING id";
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, uname);
+            ps.setString(2, hashPassword(plain));
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return new User(rs.getString("id"), uname);
+            }
         }
     }
 
-    public User createUser(String username, String plainPassword) throws SQLException {
-        String id   = UUID.randomUUID().toString();
-        String hash = hashPassword(plainPassword);
-        String sql  = "INSERT INTO authentication (id, username, password_hash) VALUES (?, ?, ?)";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setObject(1, UUID.fromString(id));
-            ps.setString(2, username);
-            ps.setString(3, hash);
-            ps.executeUpdate();
-        }
-        return new User(id, username);
-    }
-
-    public boolean userExists(String username) throws SQLException {
-        String sql = "SELECT 1 FROM authentication WHERE username = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, username);
+    public boolean userExists(String uname) throws SQLException {
+        String sql = "SELECT 1 FROM authentication WHERE username=?";
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, uname);
             try (ResultSet rs = ps.executeQuery()) { return rs.next(); }
         }
     }
 
-    public User validateUser(String username, String plainPassword) throws SQLException {
-        String sql = "SELECT id, password_hash FROM authentication WHERE username = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, username);
+    public User validateUser(String uname, String plain) throws SQLException {
+        String sql = "SELECT id, password_hash FROM authentication WHERE username=?";
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, uname);
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
-                if (!verifyPassword(plainPassword, rs.getString("password_hash"))) return null;
-                return new User(rs.getString("id"), username);
+                if (!verifyPassword(plain, rs.getString("password_hash"))) return null;
+                return new User(rs.getString("id"), uname);
             }
         }
     }
 
-    // ── Categories ────────────────────────────────────────────────────────────
+    // ── Contacts — list/search ─────────────────────────────────────────────────
 
-    public List<Category> listCategories(String userId) throws SQLException {
-        List<Category> result = new ArrayList<>();
-        String sql = "SELECT id, name, color, created_at FROM categories " +
-                     "WHERE user_id = ? ORDER BY name";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setObject(1, UUID.fromString(userId));
+    /**
+     * List contacts with optional filters.
+     * @param userId   owner
+     * @param search   partial match on name/phone/email (null = no filter)
+     * @param category exact match on category (null = no filter)
+     * @param favOnly  true = only favorites
+     * @param sort     "name_asc" | "name_desc" | "recent" (default: name_asc)
+     */
+    public List<Contact> listContacts(String userId, String search, String category,
+                                      boolean favOnly, String sort) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+            "SELECT id,name,phone,email,address,category,notes,favorite,created_at,updated_at " +
+            "FROM contacts WHERE user_id=?::uuid");
+
+        List<Object> params = new ArrayList<>();
+        params.add(userId);
+
+        if (search != null && !search.isBlank()) {
+            sql.append(" AND (lower(name) LIKE ? OR lower(phone) LIKE ? OR lower(email) LIKE ?)");
+            String pat = "%" + search.toLowerCase().trim() + "%";
+            params.add(pat); params.add(pat); params.add(pat);
+        }
+        if (category != null && !category.isBlank()) {
+            sql.append(" AND category=?");
+            params.add(category);
+        }
+        if (favOnly) {
+            sql.append(" AND favorite=TRUE");
+        }
+
+        switch (sort == null ? "name_asc" : sort) {
+            case "name_desc" -> sql.append(" ORDER BY lower(name) DESC");
+            case "recent"    -> sql.append(" ORDER BY created_at DESC");
+            default          -> sql.append(" ORDER BY lower(name) ASC");
+        }
+
+        List<Contact> result = new ArrayList<>();
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) ps.setObject(i + 1, params.get(i));
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) result.add(mapCategoryRow(rs));
+                while (rs.next()) result.add(mapRow(rs));
             }
         }
         return result;
     }
 
-    public Category createCategory(String userId, String name, String color) throws SQLException {
-        String id  = UUID.randomUUID().toString();
-        String sql = "INSERT INTO categories (id, user_id, name, color) VALUES (?, ?, ?, ?) " +
-                     "RETURNING id, name, color, created_at";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setObject(1, UUID.fromString(id));
-            ps.setObject(2, UUID.fromString(userId));
-            ps.setString(3, name);
-            ps.setString(4, color != null && !color.isEmpty() ? color : "#a78bfa");
+    public Contact getById(String id, String userId) throws SQLException {
+        String sql =
+            "SELECT id,name,phone,email,address,category,notes,favorite,created_at,updated_at " +
+            "FROM contacts WHERE id=?::uuid AND user_id=?::uuid";
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, id);
+            ps.setString(2, userId);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapCategoryRow(rs);
+                return rs.next() ? mapRow(rs) : null;
             }
         }
-        return new Category(id, name, color, "");
     }
 
-    public boolean deleteCategory(String id, String userId) throws SQLException {
-        String sql = "DELETE FROM categories WHERE id = ? AND user_id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setObject(1, UUID.fromString(id));
-            ps.setObject(2, UUID.fromString(userId));
+    // ── Contacts — CRUD ───────────────────────────────────────────────────────
+
+    public Contact createContact(String userId, String name, String phone, String email,
+                                 String address, String category, String notes,
+                                 boolean favorite) throws SQLException {
+        String sql =
+            "INSERT INTO contacts (user_id,name,phone,email,address,category,notes,favorite) " +
+            "VALUES (?::uuid,?,?,?,?,?,?,?) RETURNING id";
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, userId);
+            ps.setString(2, name);
+            ps.setString(3, nn(phone));
+            ps.setString(4, nn(email));
+            ps.setString(5, nn(address));
+            ps.setString(6, nn(category));
+            ps.setString(7, nn(notes));
+            ps.setBoolean(8, favorite);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return getByIdInternal(c, rs.getString("id"));
+            }
+        }
+    }
+
+    public Contact updateContact(String id, String userId, String name, String phone,
+                                 String email, String address, String category,
+                                 String notes, boolean favorite) throws SQLException {
+        String sql =
+            "UPDATE contacts SET name=?,phone=?,email=?,address=?,category=?,notes=?," +
+            "favorite=?,updated_at=NOW() " +
+            "WHERE id=?::uuid AND user_id=?::uuid";
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.setString(2, nn(phone));
+            ps.setString(3, nn(email));
+            ps.setString(4, nn(address));
+            ps.setString(5, nn(category));
+            ps.setString(6, nn(notes));
+            ps.setBoolean(7, favorite);
+            ps.setString(8, id);
+            ps.setString(9, userId);
+            if (ps.executeUpdate() == 0) return null;
+            return getByIdInternal(c, id);
+        }
+    }
+
+    public Contact toggleFavorite(String id, String userId) throws SQLException {
+        String sql =
+            "UPDATE contacts SET favorite = NOT favorite, updated_at=NOW() " +
+            "WHERE id=?::uuid AND user_id=?::uuid";
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, id);
+            ps.setString(2, userId);
+            if (ps.executeUpdate() == 0) return null;
+            return getByIdInternal(c, id);
+        }
+    }
+
+    public boolean deleteContact(String id, String userId) throws SQLException {
+        String sql = "DELETE FROM contacts WHERE id=?::uuid AND user_id=?::uuid";
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, id);
+            ps.setString(2, userId);
             return ps.executeUpdate() > 0;
         }
     }
 
-    private Category mapCategoryRow(ResultSet rs) throws SQLException {
-        Timestamp ts = rs.getTimestamp("created_at");
-        return new Category(
+    // ── Dashboard stats ───────────────────────────────────────────────────────
+
+    /** Returns: total, favorites, and per-category counts as a JSON-ready string */
+    public String getDashboardStats(String userId) throws SQLException {
+        String totalSql    = "SELECT COUNT(*) FROM contacts WHERE user_id=?::uuid";
+        String favSql      = "SELECT COUNT(*) FROM contacts WHERE user_id=?::uuid AND favorite=TRUE";
+        String catSql      = "SELECT category, COUNT(*) AS cnt FROM contacts WHERE user_id=?::uuid GROUP BY category ORDER BY cnt DESC";
+        String recentSql   =
+            "SELECT id,name,phone,email,address,category,notes,favorite,created_at,updated_at " +
+            "FROM contacts WHERE user_id=?::uuid ORDER BY created_at DESC LIMIT 5";
+
+        long total = 0, favs = 0;
+        try (Connection c = getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement(totalSql)) {
+                ps.setString(1, userId);
+                try (ResultSet rs = ps.executeQuery()) { if (rs.next()) total = rs.getLong(1); }
+            }
+            try (PreparedStatement ps = c.prepareStatement(favSql)) {
+                ps.setString(1, userId);
+                try (ResultSet rs = ps.executeQuery()) { if (rs.next()) favs = rs.getLong(1); }
+            }
+
+            StringBuilder cats = new StringBuilder("[");
+            try (PreparedStatement ps = c.prepareStatement(catSql)) {
+                ps.setString(1, userId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    boolean first = true;
+                    while (rs.next()) {
+                        if (!first) cats.append(",");
+                        String cat = rs.getString("category");
+                        if (cat == null || cat.isBlank()) cat = "Uncategorized";
+                        cats.append("{\"category\":\"").append(esc(cat))
+                            .append("\",\"count\":").append(rs.getLong("cnt")).append("}");
+                        first = false;
+                    }
+                }
+            }
+            cats.append("]");
+
+            StringBuilder recent = new StringBuilder("[");
+            try (PreparedStatement ps = c.prepareStatement(recentSql)) {
+                ps.setString(1, userId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    boolean first = true;
+                    while (rs.next()) {
+                        if (!first) recent.append(",");
+                        recent.append(toJson(mapRow(rs)));
+                        first = false;
+                    }
+                }
+            }
+            recent.append("]");
+
+            return "{" +
+                "\"total\":"    + total + "," +
+                "\"favorites\":" + favs + "," +
+                "\"byCategory\":" + cats + "," +
+                "\"recent\":"   + recent +
+                "}";
+        }
+    }
+
+    // ── Categories list ───────────────────────────────────────────────────────
+
+    /** Returns the distinct categories in use by this user, plus the fixed set. */
+    public List<String> getCategories() {
+        return List.of("Family", "Friends", "Work", "College", "Other");
+    }
+
+    // ── Import / Export ───────────────────────────────────────────────────────
+
+    /** Returns all contacts as CSV (name,phone,email,address,category,notes,favorite) */
+    public String exportCsv(String userId) throws SQLException {
+        StringBuilder sb = new StringBuilder("name,phone,email,address,category,notes,favorite\n");
+        String sql =
+            "SELECT name,phone,email,address,category,notes,favorite " +
+            "FROM contacts WHERE user_id=?::uuid ORDER BY lower(name) ASC";
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    sb.append(csvField(rs.getString("name"))).append(",")
+                      .append(csvField(rs.getString("phone"))).append(",")
+                      .append(csvField(rs.getString("email"))).append(",")
+                      .append(csvField(rs.getString("address"))).append(",")
+                      .append(csvField(rs.getString("category"))).append(",")
+                      .append(csvField(rs.getString("notes"))).append(",")
+                      .append(rs.getBoolean("favorite")).append("\n");
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    /** Parses CSV (skipping header) and bulk-inserts; returns count inserted. */
+    public int importCsv(String userId, String csv) throws SQLException {
+        String[] lines = csv.split("\\r?\\n");
+        int count = 0;
+        String sql =
+            "INSERT INTO contacts (user_id,name,phone,email,address,category,notes,favorite) " +
+            "VALUES (?::uuid,?,?,?,?,?,?,?)";
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            for (int i = 1; i < lines.length; i++) {  // skip header
+                String line = lines[i].trim();
+                if (line.isEmpty()) continue;
+                String[] cols = parseCsvLine(line);
+                if (cols.length < 1 || cols[0].isBlank()) continue;
+                ps.setString(1, userId);
+                ps.setString(2, cols.length > 0 ? cols[0].trim() : "");
+                ps.setString(3, cols.length > 1 ? cols[1].trim() : "");
+                ps.setString(4, cols.length > 2 ? cols[2].trim() : "");
+                ps.setString(5, cols.length > 3 ? cols[3].trim() : "");
+                ps.setString(6, cols.length > 4 ? cols[4].trim() : "");
+                ps.setString(7, cols.length > 5 ? cols[5].trim() : "");
+                ps.setBoolean(8, cols.length > 6 && "true".equalsIgnoreCase(cols[6].trim()));
+                ps.addBatch();
+                count++;
+            }
+            if (count > 0) ps.executeBatch();
+        }
+        return count;
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private Contact getByIdInternal(Connection c, String id) throws SQLException {
+        String sql =
+            "SELECT id,name,phone,email,address,category,notes,favorite,created_at,updated_at " +
+            "FROM contacts WHERE id=?::uuid";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? mapRow(rs) : null;
+            }
+        }
+    }
+
+    private Contact mapRow(ResultSet rs) throws SQLException {
+        return new Contact(
             rs.getString("id"),
             rs.getString("name"),
-            rs.getString("color"),
-            ts != null ? ts.toInstant().toString() : ""
+            nn(rs.getString("phone")),
+            nn(rs.getString("email")),
+            nn(rs.getString("address")),
+            nn(rs.getString("category")),
+            nn(rs.getString("notes")),
+            rs.getBoolean("favorite"),
+            ts(rs.getTimestamp("created_at")),
+            ts(rs.getTimestamp("updated_at"))
         );
     }
 
-    // ── Tasks ─────────────────────────────────────────────────────────────────
+    static String toJson(Contact c) {
+        return "{" +
+            "\"id\":"         + q(c.getId())        + "," +
+            "\"name\":"       + q(c.getName())      + "," +
+            "\"phone\":"      + q(c.getPhone())     + "," +
+            "\"email\":"      + q(c.getEmail())     + "," +
+            "\"address\":"    + q(c.getAddress())   + "," +
+            "\"category\":"   + q(c.getCategory())  + "," +
+            "\"notes\":"      + q(c.getNotes())     + "," +
+            "\"favorite\":"   + c.isFavorite()      + "," +
+            "\"createdAt\":"  + q(c.getCreatedAt()) + "," +
+            "\"updatedAt\":"  + q(c.getUpdatedAt()) +
+            "}";
+    }
 
-    public List<Task> listTasks(String userId) throws SQLException {
-        List<Task> result = new ArrayList<>();
-        String sql =
-            "SELECT t.id, t.title, t.description, t.status, t.priority, " +
-            "       t.due_date, t.due_time, t.category_id, c.name AS category_name, " +
-            "       t.tags, t.created_at, t.updated_at, t.completed_at " +
-            "FROM tasks t " +
-            "LEFT JOIN categories c ON t.category_id = c.id " +
-            "WHERE t.user_id = ? " +
-            "ORDER BY " +
-            "  CASE t.priority WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, " +
-            "  t.due_date ASC NULLS LAST, " +
-            "  t.created_at DESC";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setObject(1, UUID.fromString(userId));
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) result.add(mapTaskRow(rs));
+    private static String q(String v)   { return "\"" + esc(v) + "\""; }
+    private static String nn(String s)  { return s == null ? "" : s; }
+    private static String ts(Timestamp t) { return t == null ? "" : t.toInstant().toString(); }
+
+    static String esc(String v) {
+        if (v == null) return "";
+        return v.replace("\\","\\\\").replace("\"","\\\"")
+                .replace("\n","\\n").replace("\r","\\r").replace("\t","\\t");
+    }
+
+    private static String csvField(String s) {
+        if (s == null) return "";
+        if (s.contains(",") || s.contains("\"") || s.contains("\n")) {
+            return "\"" + s.replace("\"", "\"\"") + "\"";
+        }
+        return s;
+    }
+
+    /** Very simple CSV line parser (handles quoted fields). */
+    private static String[] parseCsvLine(String line) {
+        List<String> fields = new ArrayList<>();
+        StringBuilder cur = new StringBuilder();
+        boolean inQuotes = false;
+        for (int i = 0; i < line.length(); i++) {
+            char ch = line.charAt(i);
+            if (inQuotes) {
+                if (ch == '"') {
+                    if (i + 1 < line.length() && line.charAt(i + 1) == '"') { cur.append('"'); i++; }
+                    else inQuotes = false;
+                } else cur.append(ch);
+            } else {
+                if (ch == '"') inQuotes = true;
+                else if (ch == ',') { fields.add(cur.toString()); cur.setLength(0); }
+                else cur.append(ch);
             }
         }
-        return result;
-    }
-
-    public Task createTask(String userId, String title, String description,
-                           String priority, String dueDate, String dueTime,
-                           String categoryId, String tags) throws SQLException {
-        String id  = UUID.randomUUID().toString();
-        String sql =
-            "INSERT INTO tasks (id, user_id, title, description, status, priority, " +
-            "  due_date, due_time, category_id, tags) " +
-            "VALUES (?, ?, ?, ?, 'pending', ?, " +
-            "  ?::date, ?, ?::uuid, ?) " +
-            "RETURNING id, title, description, status, priority, " +
-            "  due_date, due_time, category_id, tags, created_at, updated_at, completed_at";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setObject(1, UUID.fromString(id));
-            ps.setObject(2, UUID.fromString(userId));
-            ps.setString(3, title);
-            setNullableString(ps, 4, description);
-            ps.setString(5, normalisePriority(priority));
-            setNullableString(ps, 6, dueDate);
-            setNullableString(ps, 7, dueTime);
-            setNullableString(ps, 8, categoryId);
-            ps.setString(9, tags != null ? tags : "");
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    Task t = mapTaskRowMinimal(rs);
-                    t.setCategoryName(resolveCategoryName(conn, categoryId));
-                    return t;
-                }
-            }
-        }
-        return null;
-    }
-
-    public Task updateTask(String id, String userId, String title, String description,
-                           String status, String priority, String dueDate, String dueTime,
-                           String categoryId, String tags) throws SQLException {
-        boolean completing = "completed".equals(status);
-        String sql =
-            "UPDATE tasks SET " +
-            "  title        = ?, " +
-            "  description  = ?, " +
-            "  status       = ?, " +
-            "  priority     = ?, " +
-            "  due_date     = ?::date, " +
-            "  due_time     = ?, " +
-            "  category_id  = ?::uuid, " +
-            "  tags         = ?, " +
-            "  updated_at   = NOW(), " +
-            "  completed_at = CASE WHEN ? THEN NOW() ELSE NULL END " +
-            "WHERE id = ?::uuid AND user_id = ?::uuid " +
-            "RETURNING id, title, description, status, priority, " +
-            "  due_date, due_time, category_id, tags, created_at, updated_at, completed_at";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, title);
-            setNullableString(ps, 2, description);
-            ps.setString(3, normaliseStatus(status));
-            ps.setString(4, normalisePriority(priority));
-            setNullableString(ps, 5, dueDate);
-            setNullableString(ps, 6, dueTime);
-            setNullableString(ps, 7, categoryId);
-            ps.setString(8, tags != null ? tags : "");
-            ps.setBoolean(9, completing);
-            ps.setString(10, id);
-            ps.setString(11, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    Task t = mapTaskRowMinimal(rs);
-                    t.setCategoryName(resolveCategoryName(conn, categoryId));
-                    return t;
-                }
-            }
-        }
-        return null; // not found or not owned
-    }
-
-    /** Toggle a single task's status between pending and completed. */
-    public Task toggleTask(String id, String userId) throws SQLException {
-        String sql =
-            "UPDATE tasks SET " +
-            "  status       = CASE WHEN status = 'pending' THEN 'completed' ELSE 'pending' END, " +
-            "  completed_at = CASE WHEN status = 'pending' THEN NOW() ELSE NULL END, " +
-            "  updated_at   = NOW() " +
-            "WHERE id = ?::uuid AND user_id = ?::uuid " +
-            "RETURNING id, title, description, status, priority, " +
-            "  due_date, due_time, category_id, tags, created_at, updated_at, completed_at";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, id);
-            ps.setString(2, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    Task t = mapTaskRowMinimal(rs);
-                    String catId = t.getCategoryId();
-                    t.setCategoryName(resolveCategoryName(conn, catId));
-                    return t;
-                }
-            }
-        }
-        return null;
-    }
-
-    public boolean deleteTask(String id, String userId) throws SQLException {
-        String sql = "DELETE FROM tasks WHERE id = ?::uuid AND user_id = ?::uuid";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, id);
-            ps.setString(2, userId);
-            return ps.executeUpdate() > 0;
-        }
-    }
-
-    // ── Mapping helpers ───────────────────────────────────────────────────────
-
-    /** Map a full JOIN row (includes category_name from join). */
-    private Task mapTaskRow(ResultSet rs) throws SQLException {
-        return new Task(
-            rs.getString("id"),
-            rs.getString("title"),
-            nullToEmpty(rs.getString("description")),
-            rs.getString("status"),
-            rs.getString("priority"),
-            dateToString(rs.getDate("due_date")),
-            nullToEmpty(rs.getString("due_time")),
-            nullToEmpty(rs.getString("category_id")),
-            nullToEmpty(rs.getString("category_name")),
-            nullToEmpty(rs.getString("tags")),
-            tsToString(rs.getTimestamp("created_at")),
-            tsToString(rs.getTimestamp("updated_at")),
-            tsToString(rs.getTimestamp("completed_at"))
-        );
-    }
-
-    /** Map a RETURNING row (no category_name column — must resolve separately). */
-    private Task mapTaskRowMinimal(ResultSet rs) throws SQLException {
-        return new Task(
-            rs.getString("id"),
-            rs.getString("title"),
-            nullToEmpty(rs.getString("description")),
-            rs.getString("status"),
-            rs.getString("priority"),
-            dateToString(rs.getDate("due_date")),
-            nullToEmpty(rs.getString("due_time")),
-            nullToEmpty(rs.getString("category_id")),
-            "",   // category_name resolved separately
-            nullToEmpty(rs.getString("tags")),
-            tsToString(rs.getTimestamp("created_at")),
-            tsToString(rs.getTimestamp("updated_at")),
-            tsToString(rs.getTimestamp("completed_at"))
-        );
-    }
-
-    private String resolveCategoryName(Connection conn, String categoryId) throws SQLException {
-        if (categoryId == null || categoryId.isEmpty()) return "";
-        String sql = "SELECT name FROM categories WHERE id = ?::uuid";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, categoryId);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? rs.getString("name") : "";
-            }
-        }
-    }
-
-    // ── Utility helpers ───────────────────────────────────────────────────────
-
-    private void setNullableString(PreparedStatement ps, int idx, String value) throws SQLException {
-        if (value == null || value.isEmpty()) {
-            ps.setNull(idx, Types.VARCHAR);
-        } else {
-            ps.setString(idx, value);
-        }
-    }
-
-    private String nullToEmpty(String s) {
-        return s == null ? "" : s;
-    }
-
-    private String dateToString(java.sql.Date d) {
-        return d == null ? "" : d.toString(); // "YYYY-MM-DD"
-    }
-
-    private String tsToString(Timestamp ts) {
-        return ts == null ? "" : ts.toInstant().toString();
-    }
-
-    private String normalisePriority(String p) {
-        if ("high".equals(p) || "low".equals(p)) return p;
-        return "medium";
-    }
-
-    private String normaliseStatus(String s) {
-        if ("completed".equals(s)) return "completed";
-        return "pending";
+        fields.add(cur.toString());
+        return fields.toArray(new String[0]);
     }
 }

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#8b5cf6">
-    <meta name="description" content="TaskFlow — your personal task manager.">
-    <title>TaskFlow</title>
+    <meta name="theme-color" content="#6366f1">
+    <meta name="description" content="ContactFlow — professional contact management.">
+    <title>ContactFlow</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,376 +13,367 @@
 </head>
 <body>
 
-    <!-- ══════════════════════════════════════════════════════
-         SIDEBAR
-    ══════════════════════════════════════════════════════ -->
-    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
-        <!-- Brand -->
-        <div class="sidebar-brand">
-            <span class="brand-icon" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-                </svg>
-            </span>
-            <span class="brand-name">TaskFlow</span>
+<!-- ═══════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-brand">
+        <div class="brand-logo" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
         </div>
+        <span class="brand-name">ContactFlow</span>
+    </div>
 
-        <!-- Nav links -->
-        <nav class="sidebar-nav">
-            <button class="nav-item nav-item--active" data-view="dashboard" aria-current="page">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                Dashboard
-            </button>
-            <button class="nav-item" data-view="all">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                All Tasks
-            </button>
-            <button class="nav-item" data-view="today">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                Today
-            </button>
-            <button class="nav-item" data-view="upcoming">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                Upcoming
-            </button>
-            <button class="nav-item" data-view="completed">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                Completed
-            </button>
-            <button class="nav-item" data-view="high-priority">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                High Priority
-            </button>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <button class="nav-item" data-view="dashboard">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+        </button>
+        <button class="nav-item nav-item--active" data-view="all">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            All Contacts
+            <span class="nav-badge" id="navBadgeAll"></span>
+        </button>
+        <button class="nav-item" data-view="favorites">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Favorites
+            <span class="nav-badge nav-badge--gold" id="navBadgeFav"></span>
+        </button>
 
-            <div class="nav-divider" aria-hidden="true"></div>
+        <div class="nav-divider"></div>
+        <div class="nav-section-label">Categories</div>
+        <button class="nav-item nav-item--cat" data-view="cat" data-cat="">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            All Categories
+        </button>
+        <button class="nav-item nav-item--cat" data-view="cat" data-cat="Family">
+            <span class="cat-pill" style="background:#fbbf24"></span>Family
+        </button>
+        <button class="nav-item nav-item--cat" data-view="cat" data-cat="Friends">
+            <span class="cat-pill" style="background:#34d399"></span>Friends
+        </button>
+        <button class="nav-item nav-item--cat" data-view="cat" data-cat="Work">
+            <span class="cat-pill" style="background:#60a5fa"></span>Work
+        </button>
+        <button class="nav-item nav-item--cat" data-view="cat" data-cat="College">
+            <span class="cat-pill" style="background:#a78bfa"></span>College
+        </button>
+        <button class="nav-item nav-item--cat" data-view="cat" data-cat="Other">
+            <span class="cat-pill" style="background:#94a3b8"></span>Other
+        </button>
 
-            <!-- Categories section -->
-            <div class="nav-section-label">Categories</div>
-            <div id="categoryNavList" class="category-nav-list">
-                <!-- injected by JS -->
+        <div class="nav-divider"></div>
+        <div class="nav-section-label">Account</div>
+        <button class="nav-item" data-view="settings">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Settings
+        </button>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <div class="sidebar-user-avatar" id="sidebarAvatar">?</div>
+            <span class="sidebar-user-name" id="usernameLabel"></span>
+        </div>
+        <button class="icon-btn icon-btn--danger" id="logoutBtn" title="Sign out">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+    </div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+<!-- ═══════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════ -->
+<div class="main-wrapper">
+
+    <!-- Topbar -->
+    <header class="topbar" role="banner">
+        <div class="topbar-left">
+            <button class="icon-btn sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar" aria-expanded="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <h1 class="page-title" id="pageTitle">All Contacts</h1>
+        </div>
+        <div class="topbar-right">
+            <div class="search-wrap" role="search">
+                <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input class="search-input" type="search" id="searchInput" placeholder="Search contacts…" aria-label="Search contacts" autocomplete="off">
             </div>
-            <button class="nav-item nav-item--ghost" id="addCategoryBtn">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                New Category
-            </button>
-
-            <div class="nav-divider" aria-hidden="true"></div>
-
-            <button class="nav-item" data-view="settings">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                Settings
-            </button>
-        </nav>
-
-        <!-- User area at bottom -->
-        <div class="sidebar-footer">
-            <div class="user-pill" id="userPill">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <span id="usernameLabel"></span>
-            </div>
-            <button class="icon-btn icon-btn--danger" id="logoutBtn" aria-label="Sign out">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <button class="icon-btn" id="themeToggle" aria-label="Toggle theme"></button>
+            <button class="btn btn-primary" id="addContactBtn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Add Contact</span>
             </button>
         </div>
-    </aside>
+    </header>
 
-    <!-- Mobile overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+    <main class="content" id="mainContent" role="main">
 
-    <!-- ══════════════════════════════════════════════════════
-         MAIN CONTENT AREA
-    ══════════════════════════════════════════════════════ -->
-    <div class="main-wrapper">
-
-        <!-- Top bar -->
-        <header class="topbar" role="banner">
-            <div class="topbar-left">
-                <button class="icon-btn sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar" aria-expanded="false" aria-controls="sidebar">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                </button>
-                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+        <!-- ── DASHBOARD ─────────────────────────────────── -->
+        <section class="view view--hidden" id="view-dashboard">
+            <div class="dash-stats" id="dashStats">
+                <div class="stat-card stat-card--indigo">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                    <div class="stat-body"><span class="stat-value" id="dTotal">–</span><span class="stat-label">Total Contacts</span></div>
+                </div>
+                <div class="stat-card stat-card--amber">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+                    <div class="stat-body"><span class="stat-value" id="dFavs">–</span><span class="stat-label">Favorites</span></div>
+                </div>
+                <div class="stat-card stat-card--emerald">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                    <div class="stat-body"><span class="stat-value" id="dCats">–</span><span class="stat-label">Categories Used</span></div>
+                </div>
+                <div class="stat-card stat-card--violet">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                    <div class="stat-body"><span class="stat-value" id="dRecent">–</span><span class="stat-label">Added This Week</span></div>
+                </div>
             </div>
-            <div class="topbar-right">
-                <div class="search-wrap" role="search">
-                    <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input class="search-input" type="search" id="searchInput" placeholder="Search tasks…" aria-label="Search tasks">
+
+            <div class="dash-panels">
+                <div class="dash-panel">
+                    <div class="dash-panel-hd">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        Recently Added
+                    </div>
+                    <div id="dashRecentList" class="dash-contact-list"></div>
                 </div>
-                <button class="icon-btn" id="themeToggle" aria-label="Toggle light/dark mode"></button>
-                <button class="btn btn-primary btn-add-task" id="addTaskTopBtn">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    <span>Add Task</span>
-                </button>
+                <div class="dash-panel">
+                    <div class="dash-panel-hd">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        Contacts by Category
+                    </div>
+                    <div id="dashCatChart" class="dash-cat-chart"></div>
+                </div>
             </div>
-        </header>
+        </section>
 
-        <!-- Page content -->
-        <main class="content" id="mainContent" role="main">
-
-            <!-- ─── DASHBOARD VIEW ─────────────────────── -->
-            <section class="view" id="view-dashboard">
-                <div class="dashboard-grid">
-                    <div class="stat-card stat-card--total">
-                        <div class="stat-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
-                        <div class="stat-body"><span class="stat-value" id="statTotal">0</span><span class="stat-label">Total Tasks</span></div>
-                    </div>
-                    <div class="stat-card stat-card--pending">
-                        <div class="stat-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-                        <div class="stat-body"><span class="stat-value" id="statPending">0</span><span class="stat-label">Pending</span></div>
-                    </div>
-                    <div class="stat-card stat-card--done">
-                        <div class="stat-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-                        <div class="stat-body"><span class="stat-value" id="statDone">0</span><span class="stat-label">Completed</span></div>
-                    </div>
-                    <div class="stat-card stat-card--overdue">
-                        <div class="stat-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-                        <div class="stat-body"><span class="stat-value" id="statOverdue">0</span><span class="stat-label">Overdue</span></div>
-                    </div>
-                </div>
-
-                <!-- Today + Upcoming panels -->
-                <div class="dashboard-panels">
-                    <div class="dash-panel">
-                        <div class="dash-panel-header">
-                            <h2 class="dash-panel-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Due Today
-                            </h2>
-                        </div>
-                        <div id="dashToday" class="task-list task-list--compact" role="list" aria-live="polite"></div>
-                    </div>
-                    <div class="dash-panel">
-                        <div class="dash-panel-header">
-                            <h2 class="dash-panel-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                                Upcoming (7 days)
-                            </h2>
-                        </div>
-                        <div id="dashUpcoming" class="task-list task-list--compact" role="list" aria-live="polite"></div>
-                    </div>
-                    <div class="dash-panel">
-                        <div class="dash-panel-header">
-                            <h2 class="dash-panel-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                High Priority
-                            </h2>
-                        </div>
-                        <div id="dashHigh" class="task-list task-list--compact" role="list" aria-live="polite"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ─── TASK LIST VIEW (All / Today / Upcoming / Completed / Priority / Category) ─── -->
-            <section class="view view--hidden" id="view-tasks">
-                <!-- Filter + sort toolbar -->
-                <div class="toolbar">
-                    <div class="toolbar-filters">
-                        <select class="select-input" id="filterStatus" aria-label="Filter by status">
-                            <option value="all">All Statuses</option>
-                            <option value="pending">Pending</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                        <select class="select-input" id="filterPriority" aria-label="Filter by priority">
-                            <option value="all">All Priorities</option>
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low</option>
-                        </select>
-                        <select class="select-input" id="filterCategory" aria-label="Filter by category">
-                            <option value="all">All Categories</option>
-                        </select>
-                    </div>
-                    <div class="toolbar-sort">
-                        <select class="select-input" id="sortBy" aria-label="Sort by">
-                            <option value="priority">Priority</option>
-                            <option value="dueDate">Due Date</option>
-                            <option value="createdAt">Created</option>
-                            <option value="title">A – Z</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Task list -->
-                <div id="taskList" class="task-list" role="list" aria-live="polite" aria-relevant="additions removals"></div>
-            </section>
-
-            <!-- ─── SETTINGS VIEW ─────────────────────── -->
-            <section class="view view--hidden" id="view-settings">
-                <div class="settings-card">
-                    <h2 class="settings-section-title">Appearance</h2>
-                    <div class="settings-row">
-                        <div class="settings-row-label">
-                            <span class="settings-row-name">Theme</span>
-                            <span class="settings-row-desc">Choose between light and dark mode</span>
-                        </div>
-                        <div class="theme-toggle-group" role="group" aria-label="Theme selection">
-                            <button class="theme-btn" id="settingsThemeLight" aria-pressed="false">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                                Light
-                            </button>
-                            <button class="theme-btn" id="settingsThemeDark" aria-pressed="false">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                                Dark
-                            </button>
-                        </div>
-                    </div>
-
-                    <h2 class="settings-section-title" style="margin-top:2rem;">Default Priority</h2>
-                    <div class="settings-row">
-                        <div class="settings-row-label">
-                            <span class="settings-row-name">New Task Default Priority</span>
-                            <span class="settings-row-desc">Pre-fill the priority when adding a task</span>
-                        </div>
-                        <select class="select-input" id="settingsDefaultPriority" style="width:auto;">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                        </select>
-                    </div>
-
-                    <h2 class="settings-section-title" style="margin-top:2rem;">Categories</h2>
-                    <div id="settingsCategoryList" class="settings-category-list"></div>
-                    <button class="btn btn-secondary" id="settingsAddCategoryBtn" style="margin-top:0.75rem;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Add Category
+        <!-- ── ALL CONTACTS / FAVORITES / CATEGORY ───── -->
+        <section class="view" id="view-all">
+            <!-- Filter toolbar -->
+            <div class="filter-bar">
+                <div class="filter-bar-left">
+                    <select class="select-input" id="filterCategory" aria-label="Filter by category">
+                        <option value="">All Categories</option>
+                        <option value="Family">Family</option>
+                        <option value="Friends">Friends</option>
+                        <option value="Work">Work</option>
+                        <option value="College">College</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <select class="select-input" id="sortBy" aria-label="Sort contacts">
+                        <option value="name_asc">Name A → Z</option>
+                        <option value="name_desc">Name Z → A</option>
+                        <option value="recent">Recently Added</option>
+                    </select>
+                    <button class="btn btn-outline" id="filterFavBtn" title="Show favorites only">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        Favorites
                     </button>
-
-                    <h2 class="settings-section-title" style="margin-top:2rem;">Account</h2>
-                    <div class="settings-row">
-                        <div class="settings-row-label">
-                            <span class="settings-row-name">Sign out</span>
-                            <span class="settings-row-desc">End your current session</span>
-                        </div>
-                        <button class="btn btn-danger" id="settingsLogoutBtn">Sign Out</button>
-                    </div>
                 </div>
-            </section>
-
-        </main>
-    </div>
-
-    <!-- ══════════════════════════════════════════════════════
-         ADD / EDIT TASK MODAL
-    ══════════════════════════════════════════════════════ -->
-    <div class="modal-backdrop" id="taskModalBackdrop" aria-hidden="true" hidden></div>
-    <div class="modal" id="taskModal" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle">
-        <div class="modal-header">
-            <h2 class="modal-title" id="taskModalTitle">New Task</h2>
-            <button class="icon-btn modal-close" id="taskModalClose" aria-label="Close">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form id="taskForm" novalidate>
-                <input type="hidden" id="taskIdInput">
-
-                <div class="field">
-                    <label class="field-label" for="taskTitle">Title <span class="required-star" aria-hidden="true">*</span></label>
-                    <input class="field-input" id="taskTitle" type="text" placeholder="What needs to be done?" required autocomplete="off">
-                    <span class="field-error" id="taskTitleError" role="alert"></span>
+                <div class="filter-bar-right">
+                    <button class="btn btn-outline" id="importBtn" title="Import CSV">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Import
+                    </button>
+                    <button class="btn btn-outline" id="exportBtn" title="Export CSV">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Export
+                    </button>
+                    <input type="file" id="csvFileInput" accept=".csv" style="display:none">
+                    <span class="results-count" id="resultsCount"></span>
                 </div>
-
-                <div class="field">
-                    <label class="field-label" for="taskDescription">Description</label>
-                    <textarea class="field-input field-textarea" id="taskDescription" placeholder="Add details, notes, or context…" rows="3"></textarea>
-                </div>
-
-                <div class="form-row">
-                    <div class="field">
-                        <label class="field-label" for="taskPriority">Priority</label>
-                        <select class="field-input" id="taskPriority">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label class="field-label" for="taskCategory">Category</label>
-                        <select class="field-input" id="taskCategory">
-                            <option value="">No Category</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="field">
-                        <label class="field-label" for="taskDueDate">Due Date</label>
-                        <input class="field-input" id="taskDueDate" type="date">
-                    </div>
-                    <div class="field">
-                        <label class="field-label" for="taskDueTime">Due Time</label>
-                        <input class="field-input" id="taskDueTime" type="time">
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label class="field-label" for="taskTags">Tags <span class="field-label-hint">(comma-separated)</span></label>
-                    <input class="field-input" id="taskTags" type="text" placeholder="e.g. work, urgent, follow-up" autocomplete="off">
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-ghost" id="taskModalCancel">Cancel</button>
-            <button class="btn btn-primary" id="taskModalSave">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                Save Task
-            </button>
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════════════════
-         ADD CATEGORY MODAL
-    ══════════════════════════════════════════════════════ -->
-    <div class="modal-backdrop" id="catModalBackdrop" aria-hidden="true" hidden></div>
-    <div class="modal modal--sm" id="catModal" role="dialog" aria-modal="true" aria-labelledby="catModalTitle">
-        <div class="modal-header">
-            <h2 class="modal-title" id="catModalTitle">New Category</h2>
-            <button class="icon-btn modal-close" id="catModalClose" aria-label="Close">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-        </div>
-        <div class="modal-body">
-            <div class="field">
-                <label class="field-label" for="catName">Name <span class="required-star" aria-hidden="true">*</span></label>
-                <input class="field-input" id="catName" type="text" placeholder="e.g. Work, Personal, Health" autocomplete="off">
-                <span class="field-error" id="catNameError" role="alert"></span>
             </div>
-            <div class="field">
-                <label class="field-label">Color</label>
-                <div class="color-swatches" id="colorSwatches" role="radiogroup" aria-label="Category color">
-                    <!-- injected by JS -->
+
+            <!-- Contact grid -->
+            <div id="contactList" class="contact-grid" role="list" aria-live="polite"></div>
+        </section>
+
+        <!-- ── SETTINGS ───────────────────────────────── -->
+        <section class="view view--hidden" id="view-settings">
+            <div class="settings-card">
+                <h2 class="settings-section-title">Appearance</h2>
+                <div class="settings-row">
+                    <div class="settings-row-label">
+                        <span class="settings-row-name">Theme</span>
+                        <span class="settings-row-desc">Switch between light and dark mode</span>
+                    </div>
+                    <div class="theme-toggle-group">
+                        <button class="theme-btn" id="settingsThemeLight" aria-pressed="true">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                            Light
+                        </button>
+                        <button class="theme-btn" id="settingsThemeDark" aria-pressed="false">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                            Dark
+                        </button>
+                    </div>
                 </div>
-                <input type="hidden" id="catColor" value="#a78bfa">
+
+                <h2 class="settings-section-title" style="margin-top:2rem">Data Management</h2>
+                <div class="settings-row">
+                    <div class="settings-row-label">
+                        <span class="settings-row-name">Export Contacts</span>
+                        <span class="settings-row-desc">Download all contacts as a CSV file</span>
+                    </div>
+                    <button class="btn btn-secondary" id="settingsExportBtn">Export CSV</button>
+                </div>
+                <div class="settings-row" style="margin-top:1rem">
+                    <div class="settings-row-label">
+                        <span class="settings-row-name">Import Contacts</span>
+                        <span class="settings-row-desc">Upload a CSV file to import contacts</span>
+                    </div>
+                    <button class="btn btn-secondary" id="settingsImportBtn">Import CSV</button>
+                </div>
+
+                <h2 class="settings-section-title" style="margin-top:2rem">Account</h2>
+                <div class="settings-row">
+                    <div class="settings-row-label">
+                        <span class="settings-row-name">Sign out</span>
+                        <span class="settings-row-desc">End your current session</span>
+                    </div>
+                    <button class="btn btn-danger" id="settingsLogoutBtn">Sign Out</button>
+                </div>
             </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-ghost" id="catModalCancel">Cancel</button>
-            <button class="btn btn-primary" id="catModalSave">Create</button>
+        </section>
+
+    </main>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ADD / EDIT CONTACT MODAL
+═══════════════════════════════════════════ -->
+<div class="modal-backdrop" id="contactModalBackdrop" hidden></div>
+<div class="modal" id="contactModal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+    <div class="modal-header">
+        <h2 class="modal-title" id="contactModalTitle">New Contact</h2>
+        <button class="icon-btn modal-close" id="contactModalClose" aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form id="contactForm" novalidate>
+            <input type="hidden" id="contactIdInput">
+
+            <div class="modal-avatar-row">
+                <div class="modal-avatar" id="modalAvatar">?</div>
+                <div class="field" style="flex:1">
+                    <label class="field-label" for="contactName">Full Name <span class="req">*</span></label>
+                    <input class="field-input" id="contactName" type="text" placeholder="e.g. Jane Smith" required autocomplete="off">
+                    <span class="field-error" id="contactNameError"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="field">
+                    <label class="field-label" for="contactPhone">Phone</label>
+                    <input class="field-input" id="contactPhone" type="tel" placeholder="+1 555 000 0000" autocomplete="off">
+                </div>
+                <div class="field">
+                    <label class="field-label" for="contactEmail">Email</label>
+                    <input class="field-input" id="contactEmail" type="email" placeholder="jane@example.com" autocomplete="off">
+                    <span class="field-error" id="contactEmailError"></span>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="field-label" for="contactAddress">Address</label>
+                <input class="field-input" id="contactAddress" type="text" placeholder="123 Main St, City, Country" autocomplete="off">
+            </div>
+
+            <div class="form-row">
+                <div class="field">
+                    <label class="field-label" for="contactCategory">Category</label>
+                    <select class="field-input" id="contactCategory">
+                        <option value="">— None —</option>
+                        <option value="Family">Family</option>
+                        <option value="Friends">Friends</option>
+                        <option value="Work">Work</option>
+                        <option value="College">College</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="field fav-field">
+                    <label class="field-label">Favorite</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="contactFavorite">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">Mark as favorite</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="field-label" for="contactNotes">Notes</label>
+                <textarea class="field-input field-textarea" id="contactNotes" rows="3" placeholder="Any additional notes…"></textarea>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-ghost" id="contactModalCancel">Cancel</button>
+        <button class="btn btn-primary" id="contactModalSave">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save Contact
+        </button>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     CONTACT DETAIL PANEL (slide-in)
+═══════════════════════════════════════════ -->
+<div class="detail-overlay" id="detailOverlay" hidden></div>
+<aside class="detail-panel" id="detailPanel" role="complementary" aria-label="Contact details" hidden>
+    <div class="detail-panel-hd">
+        <button class="icon-btn" id="detailClose" aria-label="Close details">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <span class="detail-panel-title">Contact Details</span>
+        <div style="display:flex;gap:6px">
+            <button class="icon-btn" id="detailEditBtn" aria-label="Edit contact">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="icon-btn icon-btn--danger" id="detailDeleteBtn" aria-label="Delete contact">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            </button>
         </div>
     </div>
+    <div class="detail-panel-body" id="detailPanelBody"></div>
+</aside>
 
-    <!-- ══════════════════════════════════════════════════════
-         DELETE CONFIRMATION DIALOG
-    ══════════════════════════════════════════════════════ -->
-    <div class="modal-backdrop" id="deleteBackdrop" aria-hidden="true" hidden></div>
-    <div class="modal modal--sm" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
-        <div class="modal-header">
-            <h2 class="modal-title" id="deleteModalTitle">Delete Task?</h2>
-        </div>
-        <div class="modal-body">
-            <p style="color:var(--text-secondary);font-size:0.9rem;">This will permanently delete <strong id="deleteTaskName"></strong>. This action cannot be undone.</p>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-ghost" id="deleteCancelBtn">Cancel</button>
-            <button class="btn btn-danger" id="deleteConfirmBtn">Delete</button>
+<!-- ═══════════════════════════════════════════
+     DELETE CONFIRMATION MODAL
+═══════════════════════════════════════════ -->
+<div class="modal-backdrop" id="deleteBackdrop" hidden></div>
+<div class="modal modal--sm" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+    <div class="modal-header">
+        <h2 class="modal-title" id="deleteModalTitle">Delete Contact?</h2>
+    </div>
+    <div class="modal-body">
+        <div class="delete-confirm-body">
+            <div class="delete-icon-wrap">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            </div>
+            <p>This will permanently delete <strong id="deleteContactName"></strong>. This cannot be undone.</p>
         </div>
     </div>
+    <div class="modal-footer">
+        <button class="btn btn-ghost" id="deleteCancelBtn">Cancel</button>
+        <button class="btn btn-danger" id="deleteConfirmBtn">Delete</button>
+    </div>
+</div>
 
-    <!-- ══════════════════════════════════════════════════════
-         GLOBAL TOAST
-    ══════════════════════════════════════════════════════ -->
-    <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+<!-- ═══════════════════════════════════════════
+     TOAST
+═══════════════════════════════════════════ -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
-    <script src="./config.js"></script>
-    <script src="./script.js"></script>
+<script src="./config.js"></script>
+<script src="./script.js"></script>
 </body>
 </html>
