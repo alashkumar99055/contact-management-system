@@ -1,9 +1,7 @@
 services:
-  - type: web
+  - type: static
     name: contactflow-frontend
-    env: static
-    rootDir: frontend
-    staticPublishPath: .
+    staticPublishPath: frontend
     routes:
       - type: rewrite
         source: /*
