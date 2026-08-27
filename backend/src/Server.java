@@ -25,6 +25,7 @@ public class Server {
     private final ConcurrentHashMap<String, String> sessionUserId = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Long>   sessionExpiry = new ConcurrentHashMap<>();
     private static final long TTL = 8 * 60 * 60 * 1000L;
+    private static final String CORS_ORIGINS = System.getenv().getOrDefault("CORS_ORIGINS", "*");
 
     public Server(int port) throws SQLException {
         this.port = port;
@@ -318,7 +319,17 @@ public class Server {
     // ── HTTP helpers ──────────────────────────────────────────────────────────
 
     private void cors(HttpExchange ex) {
-        ex.getResponseHeaders().set("Access-Control-Allow-Origin","*");
+        String origin = ex.getRequestHeaders().getFirst("Origin");
+        boolean allowed = "*".equals(CORS_ORIGINS) || (origin != null &&
+            java.util.Arrays.stream(CORS_ORIGINS.split(","))
+                .map(String::trim).anyMatch(origin::equals));
+        if (!allowed && origin != null) {
+            allowed = java.util.Arrays.stream(CORS_ORIGINS.split(","))
+                .map(String::trim)
+                .anyMatch(host -> origin.equals("https://" + host) || origin.equals("http://" + host));
+        }
+        ex.getResponseHeaders().set("Access-Control-Allow-Origin", allowed && origin != null ? origin : "*");
+        if (allowed && origin != null) ex.getResponseHeaders().set("Vary", "Origin");
         ex.getResponseHeaders().set("Access-Control-Allow-Methods","GET,POST,PUT,DELETE,OPTIONS");
         ex.getResponseHeaders().set("Access-Control-Allow-Headers","Content-Type,Authorization");
     }
