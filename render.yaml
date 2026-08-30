@@ -34,3 +34,4 @@ services:
 
 databases:
   - name: contactflow-db
+    ipAllowList: []

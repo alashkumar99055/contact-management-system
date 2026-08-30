@@ -31,14 +31,30 @@ public class Database {
         this.url      = url;
         this.username = username;
         this.password = password;
-        initSchema();
+        
+        // Test connection and initialize schema
+        System.out.println("[DB] Initializing database schema...");
+        try {
+            initSchema();
+            System.out.println("[DB] ✓ Schema initialized successfully");
+        } catch (SQLException e) {
+            System.err.println("[DB] ✗ Failed to initialize schema");
+            System.err.println("[DB] Error: " + e.getMessage());
+            throw e;
+        }
     }
 
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+        try {
+            return DriverManager.getConnection(url, username, password);
+        } catch (SQLException e) {
+            System.err.println("[DB] ✗ Connection failed!");
+            System.err.println("[DB] URL: " + url.replaceAll(":[^:@]+@",":*****@"));
+            System.err.println("[DB] User: " + username);
+            System.err.println("[DB] Error: " + e.getMessage());
+            throw e;
+        }
     }
-
-    // ── Schema ────────────────────────────────────────────────────────────────
 
     private void initSchema() throws SQLException {
         String authSql =
@@ -74,14 +90,28 @@ public class Database {
         String idxCategory  = "CREATE INDEX IF NOT EXISTS idx_contacts_category ON contacts(user_id, category)";
 
         try (Connection c = getConnection(); Statement st = c.createStatement()) {
+            // Create authentication table
+            System.out.println("[DB] Creating authentication table...");
             st.execute(authSql);
+            
+            // Create contacts table
+            System.out.println("[DB] Creating contacts table...");
             st.execute(contactsSql);
+            
+            // Add columns if missing (for migrations)
+            System.out.println("[DB] Applying schema migrations...");
             st.execute(addCategory);
             st.execute(addFavorite);
+            
+            // Create indexes for performance
+            System.out.println("[DB] Creating indexes...");
             st.execute(idxUser);
             st.execute(idxName);
             st.execute(idxFavorite);
             st.execute(idxCategory);
+        } catch (SQLException e) {
+            System.err.println("[DB] ✗ Schema initialization error: " + e.getMessage());
+            throw e;
         }
     }
 

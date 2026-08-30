@@ -424,8 +424,10 @@ public class Server {
         String user = System.getenv("POSTGRES_USER");
         String pass = System.getenv("POSTGRES_PASSWORD");
 
+        // Try DATABASE_URL first (set by Render)
         if (url==null||url.isEmpty()) url = System.getenv("DATABASE_URL");
 
+        // Try PostgreSQL standard environment variables (PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD)
         if ((url==null||url.isEmpty()) && System.getenv("PGHOST")!=null) {
             String host = System.getenv("PGHOST");
             String dbp  = System.getenv().getOrDefault("PGPORT","5432");
@@ -435,24 +437,49 @@ public class Server {
             url  = "jdbc:postgresql://"+host+":"+dbp+"/"+db;
         }
 
-        if (url==null||url.isEmpty()) url = "jdbc:postgresql://localhost:5432/contactflow";
-        if (user==null||user.isEmpty()) user = "postgres";
-        if (pass==null||pass.isEmpty()) pass = "postgres";
+        // Default to local development if nothing is set
+        if (url==null||url.isEmpty()) {
+            System.out.println("[DB] No database URL found, using local defaults");
+            url = "jdbc:postgresql://localhost:5432/contactflow";
+        }
 
+        // Parse postgresql:// and postgres:// URIs (from DATABASE_URL or fallbacks)
         if ((url.startsWith("postgres://")||url.startsWith("postgresql://"))&&!url.startsWith("jdbc:")) {
             try {
                 URI uri = new URI(url);
                 String info = uri.getUserInfo();
                 if (info!=null) {
                     String[] parts = info.split(":",2);
-                    user = parts[0];
-                    if (parts.length>1) pass = parts[1];
+                    user = java.net.URLDecoder.decode(parts[0], "UTF-8");
+                    if (parts.length>1) pass = java.net.URLDecoder.decode(parts[1], "UTF-8");
                 }
-                url = "jdbc:postgresql://"+uri.getHost()+":"+(uri.getPort()==-1?5432:uri.getPort())+uri.getPath();
-            } catch (URISyntaxException e) { throw new SQLException("Bad DATABASE_URL",e); }
+                String host = uri.getHost();
+                int port = uri.getPort()==-1 ? 5432 : uri.getPort();
+                String path = uri.getPath();
+                if (path==null||path.isEmpty()) path = "/contactflow";
+                url = "jdbc:postgresql://"+host+":"+port+path;
+            } catch (URISyntaxException e) { 
+                throw new SQLException("Bad DATABASE_URL format: " + url, e); 
+            } catch (Exception e) {
+                throw new SQLException("Error parsing DATABASE_URL", e);
+            }
         }
 
-        System.out.println("Connecting to database: " + url.replaceAll(":[^:@]+@",":*****@"));
+        // Set defaults only if still not set
+        if (user==null||user.isEmpty()) {
+            System.out.println("[DB] WARNING: No database username provided, using default 'postgres'");
+            user = "postgres";
+        }
+        if (pass==null||pass.isEmpty()) {
+            System.out.println("[DB] WARNING: No database password provided, using default 'postgres'");
+            pass = "postgres";
+        }
+
+        // Log connection info (with password masked)
+        String displayUrl = url.replaceAll(":[^:@]+@",":*****@");
+        System.out.println("[DB] Connecting to database: " + displayUrl);
+        System.out.println("[DB] Database user: " + user);
+        
         return new Database(url, user, pass);
     }
 }
