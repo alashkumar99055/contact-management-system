@@ -16,7 +16,8 @@ services:
           name: contactflow-frontend
           property: host
 
-  - type: static
+  - type: web
+    runtime: static
     name: contactflow-frontend
     buildCommand: sed -i "s|__BACKEND_URL__|https://${BACKEND_HOST}|g" frontend/config.js
     staticPublishPath: frontend
