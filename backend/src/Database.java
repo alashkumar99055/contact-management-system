@@ -15,6 +15,18 @@ public class Database {
     private final String username;
     private final String password;
 
+    // Load PostgreSQL JDBC driver explicitly
+    static {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            System.err.println("PostgreSQL JDBC driver not found on classpath!");
+            System.err.println("For local testing: Download postgresql-42.6.0.jar and add to classpath");
+            System.err.println("Or use Maven: mvn clean package && java -jar target/app.jar");
+            throw new RuntimeException("PostgreSQL driver initialization failed", e);
+        }
+    }
+
     public Database(String url, String username, String password) throws SQLException {
         this.url      = url;
         this.username = username;

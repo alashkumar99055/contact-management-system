@@ -1,56 +1,83 @@
-# ContactFlow — compile & start backend
-# Requires: PostgreSQL running on localhost:5432 with database "contactflow"
-#
-# Quick PostgreSQL setup (run once):
-#   psql -U postgres -c "CREATE DATABASE contactflow;"
-#
-# Set custom DB credentials before running this script if needed:
-#   $env:PGPASSWORD = "your-password"
-#   $env:PGUSER     = "your-username"
-#   $env:PGDATABASE = "contactflow"
-#
-# Usage:
-#   powershell -ExecutionPolicy Bypass -File start.ps1
+# ContactFlow — Compile & Start Backend
+# Simple build and run script that doesn't require Maven
+# Just needs: Java 17+ and PostgreSQL running on localhost:5432
 
-$pgJar  = "$env:USERPROFILE\.m2\repository\org\postgresql\postgresql\42.6.0\postgresql-42.6.0.jar"
-$srcDir = "$PSScriptRoot\backend\src"
-$outDir = "$PSScriptRoot\backend\target\classes"
+param()
 
-# ── 1. Check Java ─────────────────────────────────────────────────
-try { $jv = java -version 2>&1 | Select-String "version"; Write-Host "Java: $jv" -ForegroundColor Cyan }
-catch { Write-Host "ERROR: Java not found. Install JDK 17+." -ForegroundColor Red; Read-Host "Press Enter"; exit 1 }
+$BackendDir = Join-Path $PSScriptRoot "backend"
+$SrcDir = Join-Path $BackendDir "src"
+$OutDir = Join-Path $BackendDir "target\classes"
+$LibDir = Join-Path $BackendDir "lib"
+$PgJarFile = "postgresql-42.6.0.jar"
+$PgJarPath = Join-Path $LibDir $PgJarFile
+$PgJarUrl = "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.6.0/postgresql-42.6.0.jar"
 
-# ── 2. Check PostgreSQL JAR ───────────────────────────────────────
-if (-not (Test-Path $pgJar)) {
-    Write-Host "Downloading PostgreSQL driver..." -ForegroundColor Yellow
-    New-Item -ItemType Directory -Path (Split-Path $pgJar) -Force | Out-Null
-    Invoke-WebRequest -Uri "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.6.0/postgresql-42.6.0.jar" -OutFile $pgJar -UseBasicParsing
+Write-Host "ContactFlow Backend - Build & Start" -ForegroundColor Cyan
+Write-Host ""
+
+# 1. Check Java
+Write-Host "Checking Java..." -ForegroundColor Yellow
+try {
+    $jv = java -version 2>&1 | Select-String "version"
+    Write-Host "OK: $jv" -ForegroundColor Green
+} catch {
+    Write-Host "FAILED: Java 17+ not found" -ForegroundColor Red
+    exit 1
 }
-Write-Host "PostgreSQL driver: OK" -ForegroundColor Cyan
 
-# ── 3. Compile ────────────────────────────────────────────────────
-Write-Host "`n[1/2] Compiling backend..." -ForegroundColor Cyan
-New-Item -ItemType Directory -Path $outDir -Force | Out-Null
-Remove-Item "$outDir\*.class" -ErrorAction SilentlyContinue
-
-$errors = javac -cp $pgJar -d $outDir `
-    "$srcDir\User.java" `
-    "$srcDir\Contact.java" `
-    "$srcDir\Database.java" `
-    "$srcDir\Server.java" `
-    "$srcDir\Main.java" 2>&1
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Compile errors:" -ForegroundColor Red
-    $errors | ForEach-Object { Write-Host $_ }
-    Read-Host "Press Enter to exit"; exit 1
+# 2. Download PostgreSQL Driver
+if (-not (Test-Path $PgJarPath)) {
+    Write-Host "`nDownloading PostgreSQL JDBC driver (42.6.0)..." -ForegroundColor Yellow
+    New-Item -ItemType Directory -Path $LibDir -Force | Out-Null
+    
+    try {
+        Invoke-WebRequest -Uri $PgJarUrl -OutFile $PgJarPath -UseBasicParsing -ErrorAction Stop
+        Write-Host "Downloaded OK" -ForegroundColor Green
+    } catch {
+        Write-Host "FAILED: Could not download driver" -ForegroundColor Red
+        Write-Host "Error: $_" -ForegroundColor Red
+        exit 1
+    }
+} else {
+    Write-Host "`nPostgreSQL driver: OK (already downloaded)" -ForegroundColor Green
 }
-Write-Host "  Compiled OK" -ForegroundColor Green
 
-# ── 4. Start ──────────────────────────────────────────────────────
-Write-Host "`n[2/2] Starting ContactFlow backend on http://localhost:8080 ..." -ForegroundColor Cyan
-Write-Host "  Open: frontend\index.html in your browser" -ForegroundColor Yellow
-Write-Host "  Stop: Ctrl+C`n"
+# 3. Compile Java Files
+Write-Host "`nCompiling Java files..." -ForegroundColor Yellow
+New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
 
-Set-Location "$PSScriptRoot\backend"
-java -cp "target\classes;$pgJar" Main
+$classpath = "$PgJarPath;$OutDir"
+$files = "User.java", "Contact.java", "Category.java", "Database.java", "Server.java", "Main.java"
+
+$errors = 0
+foreach ($file in $files) {
+    $srcPath = Join-Path $SrcDir $file
+    if (Test-Path $srcPath) {
+        javac -cp $classpath -d $OutDir $srcPath 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "  ERROR: $file" -ForegroundColor Red
+            $errors++
+        } else {
+            Write-Host "  OK: $file" -ForegroundColor Green
+        }
+    }
+}
+
+if ($errors -gt 0) {
+    Write-Host "`nCompilation failed!" -ForegroundColor Red
+    exit 1
+}
+
+# 4. Start Backend
+Write-Host "`nStarting ContactFlow Backend..." -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Server: http://0.0.0.0:8080" -ForegroundColor Cyan
+Write-Host "Database: jdbc:postgresql://localhost:5432/contactflow" -ForegroundColor Cyan
+Write-Host "Frontend: open frontend/index.html" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Press Ctrl+C to stop`n" -ForegroundColor Yellow
+
+Push-Location $SrcDir
+java -cp $classpath Main
+Pop-Location
+
